@@ -9,7 +9,7 @@ const cartItems = document.querySelector(".cart-items");
 const cartTotal = document.querySelector(".cart-total");
 const productsDOM = document.querySelector(".products-center");
 //Cart
-let cart = [];
+let cart = []; // Avoid using global variables.
 
 //when click outside of the catDom.it should be closed
 window.onclick = function (event) {
@@ -23,10 +23,8 @@ class Product {
   async getProduct() {
     try {
       const getData = await fetch("products.json")
-        .then((res) => res.json())
-        .then();
-      let products = getData.items;
-      products = products.map((item) => {
+        .then((res) => res.json());
+      let products = getData.items.map((item) => {
         const id = item.sys.id;
 
         const { price, title } = item.fields;
@@ -42,7 +40,7 @@ class Product {
   }
 }
 
-//UI class for Importing functionallity and product elements to DOM
+//UI class for Importing functionality and product elements to DOM
 class UI {
   showProducts(product) {
     let result = "";
@@ -67,27 +65,27 @@ class UI {
 
     productsDOM.innerHTML = result;
   }
-  showCart() {
+  bindShowCartHandler() {
     cartBtn.addEventListener("click", () => {
       cartOverlay.classList.add("transparentBcg");
       cartDom.classList.add("showCart");
     });
   }
-  closeCart() {
+  bindCloseCartHandler() {
     closeCartBtn.addEventListener("click", () => {
       cartOverlay.classList.remove("transparentBcg");
       cartDom.classList.remove("showCart");
     });
   }
-  setupAPP() {
-    this.showCart();
-    this.closeCart();
+  setupApp() {
+    this.bindShowCartHandler();
+    this.bindCloseCartHandler();
     cart = Storage.getCart();
     this.setValues(cart);
     this.populateCart(cart);
   }
   populateCart() {
-    cart.map((item) => this.printCarts(item));
+    cart.forEach(this.printCarts);
   }
   addToCart() {
     const buttons = [...document.querySelectorAll(".bag-btn")];
@@ -103,7 +101,7 @@ class UI {
           inCart.amount += 1;
 
           let showAmount = [...document.querySelectorAll(".item-amount")];
-          showAmount.map((p) => {
+          showAmount.forEach((p) => {
             let pId = p.dataset.id;
             if (pId === id) {
               p.innerText = inCart.amount;
@@ -222,7 +220,7 @@ class Storage {
 document.addEventListener("DOMContentLoaded", () => {
   const product = new Product();
   const ui = new UI();
-  ui.setupAPP();
+  ui.setupApp();
   product
     .getProduct()
     .then((products) => {
